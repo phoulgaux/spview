@@ -74,7 +74,7 @@ def print_hello():
 # if __name__ == "main":
 with open("spout.txt", "w") as f:
     f.write(print_hello())
-    eps = get_episodes(4, 6)
+    eps = get_episodes()
     eps_flat = [x for season in eps for x in season]
     episode_count = len(eps_flat)
     season_count = len(eps)
