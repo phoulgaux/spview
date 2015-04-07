@@ -9,7 +9,6 @@ import requests
 def get_episode_data(season, episode):
     """Returns dictionary with data for given episode or None when there is no such an episode"""
     req = requests.get(get_url_for_episode(season, episode))
-    print("Getting data for: S{0:02d}E{1:02d}".format(season, episode))
     if req.status_code == 404:
         return None
     response = req.text
@@ -21,6 +20,9 @@ def get_episode_data(season, episode):
     # air date
     match = re.search("<span\s*class=\'air-date\'>([^<]+)", response)
     ep['aired'] = datetime.datetime.strptime(match.group(1), "%B %d, %Y")
+    # wiki page
+    match = re.search("href=\"([^<]+)\" title=\"Read wiki\"></a>", response)
+    ep['wiki'] = match.group(1)
     # description
     match = re.search("</header>\s*<p class=\"\">([^<]+)</p>\s*</article>", response)
     ep['description'] = match.group(1)
@@ -33,10 +35,11 @@ def get_url_for_episode(season, episode):
     return "http://southpark.cc.com/full-episodes/s{0:02d}e{1:02d}".format(season, episode)
 
 
-def get_episodes():
+def get_episodes(start=1, end=99):
+    """Downloads data from given seasons"""
     eps = []
-    season = 0
-    while season < 1:
+    season = start-1
+    while season < end:
         season += 1
         ep = get_episode_data(season, 1)
         if not ep:  # no first episode ergo last season
@@ -52,28 +55,29 @@ def get_episodes():
     return eps
 
 
-def fancy_episode(season, episode):
-    ep = get_episode_data(season, episode)
+def fancy_episode(ep):
     if not ep:
-        print("No such an episode: S{0:02d}E{1:02d}".format(season, episode))
-        return
-    print("South Park S{0:02d}E{1:02d}".format(season, episode))
-    print("Title:".ljust(15) + ep['title'])
-    print("First aired:".ljust(15) + ep['aired'].date().isoformat())
-    # print("SP Wiki:".ljust(15) + ep['wiki'])  # TODO: wiki
-    print("Description:".ljust(15) + ep['description'])
-    print("\n")
+        return "No such an episode: S{0:02d}E{1:02d}".format(ep['season'], ep['episode'])
+    return '\n'.join(("South Park S{0:02d}E{1:02d}".format(ep['season'], ep['episode']),
+                      "Title:".ljust(15) + ep['title'],
+                      "First aired:".ljust(15) + ep['aired'].date().isoformat(),
+                      "SP Wiki:".ljust(15) + ep['wiki'],
+                      "Description:".ljust(15) + ep['description'],
+                      "\n\n"))
 
 
 def print_hello():
     return '\n'.join(("South Park episode lister",
-            "https://github.com/phreme/spview",
-            "Piotr 'phreme' Balbier, April 2015 OOP classes exercise\n"))
+                      "https://github.com/phreme/spview",
+                      "Piotr 'phreme' Balbier, April 2015 OOP classes exercise\n\n"))
 
 # if __name__ == "main":
-print_hello()
-eps = get_episodes()
-eps_flat = [x for season in eps for x in season]
-episode_count = len(eps_flat)
-season_count = len(eps)
-print("Received {0} episodes from {1} season(s)".format(episode_count, season_count))
+with open("spout.txt", "w") as f:
+    f.write(print_hello())
+    eps = get_episodes(4, 6)
+    eps_flat = [x for season in eps for x in season]
+    episode_count = len(eps_flat)
+    season_count = len(eps)
+    f.write("Received {0} episodes from {1} season(s)\n\n".format(episode_count, season_count))
+    for ep in eps_flat:
+        f.write(fancy_episode(ep))
