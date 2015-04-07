@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # Disclaimer: Python 3 used. Python 2 somehow refuses to install properly on my workstation
 
+import datetime
 import re
 import requests
 
@@ -17,8 +18,8 @@ def get_episode_data(season, episode):
     match = re.search("class=\"title\">([^<]+)", response)
     ep['title'] = match.group(1)
     # air date
-    # match = re.search("class=\"air-date\">([^<]+)", response) # TODO: Still some problems
-    # ep['aired'] = match.group(1)
+    match = re.search("<span\s*class=\'air-date\'>([^<]+)", response)
+    ep['aired'] = datetime.datetime.strptime(match.group(1), "%B %d, %Y")
     # description
     match = re.search("</header>\s*<p class=\"\">([^<]+)</p>\s*</article>", response)
     ep['description'] = match.group(1)
@@ -32,14 +33,31 @@ def get_url_for_episode(season, episode):
 
 
 def list_episodes():
-    pass
+    eps = []
+    last_season = False
+    while not last_season:
+        pass
+    return eps
+
+
+def fancy_episode(season, episode):
+    ep = get_episode_data(season, episode)
+    if not ep:
+        print("No such an episode: S{0:02d}E{1:02d}".format(season, episode))
+        return
+    print("South Park S{0:02d}E{1:02d}".format(season, episode))
+    print("Title:".ljust(15) + ep['title'])
+    print("First aired:".ljust(15) + ep['aired'].date().isoformat())
+    # print("SP Wiki:".ljust(15) + ep['wiki'])
+    print("Description:".ljust(15) + ep['description'])
+    print("\n")
 
 
 def print_hello():
     print("South Park episode lister")
     print("https://github.com/phreme/spview")
-    print("Piotr 'phreme' Balbier, 2015 OOP classes exercise")
+    print("Piotr 'phreme' Balbier, 2015 OOP classes exercise\n")
 
 # if __name__ == "main":
 print_hello()
-print(get_episode_data(1, 3))
+list_episodes()
