@@ -71,13 +71,13 @@ def print_hello():
                       "https://github.com/phreme/spview",
                       "Piotr 'phreme' Balbier, April 2015 OOP classes exercise\n\n"))
 
-# if __name__ == "main":
-with open("spout.txt", "w") as f:
-    f.write(print_hello())
-    eps = get_episodes()
-    eps_flat = [x for season in eps for x in season]
-    episode_count = len(eps_flat)
-    season_count = len(eps)
-    f.write("Received {0} episodes from {1} season(s)\n\n".format(episode_count, season_count))
-    for ep in eps_flat:
-        f.write(fancy_episode(ep))
+if __name__ == "__main__":
+    with open("spout.txt", "w") as f:
+        f.write(print_hello())
+        eps = get_episodes()
+        eps_flat = [x for season in eps for x in season]
+        episode_count = len(eps_flat)
+        season_count = len(eps)
+        f.write("Received {0} episodes from {1} season(s)\n\n".format(episode_count, season_count))
+        for ep in eps_flat:
+            f.write(fancy_episode(ep))
