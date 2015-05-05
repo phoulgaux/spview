@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # Disclaimer: Python 3 used. Python 2 somehow refuses to install properly on my workstation
 
+import calendar
 import datetime
 import re
 import requests
@@ -72,12 +73,26 @@ def print_hello():
                       "Piotr 'phreme' Balbier, April 2015 OOP classes exercise\n\n"))
 
 if __name__ == "__main__":
-    with open("spout.txt", "w") as f:
-        f.write(print_hello())
-        eps = get_episodes()
+    eps = get_episodes(1, 18)
+    with open("data.csv", "w") as f:
         eps_flat = [x for season in eps for x in season]
-        episode_count = len(eps_flat)
-        season_count = len(eps)
-        f.write("Received {0} episodes from {1} season(s)\n\n".format(episode_count, season_count))
-        for ep in eps_flat:
-            f.write(fancy_episode(ep))
+        monthly = dict()
+        for episode in eps_flat:
+            month = episode['aired'].month
+            if month in monthly:
+                monthly[month] += 1
+            else:
+                monthly[month] = 1
+        f.write("Month,Number\n")
+        for m in range(1, 13):
+            if m in monthly:
+                f.write("{0},{1}\n".format(calendar.month_name[m], monthly[m]))
+
+    # with open("spout.txt", "w") as f:
+    #     f.write(print_hello())
+    #     eps_flat = [x for season in eps for x in season]
+    #     episode_count = len(eps_flat)
+    #     season_count = len(eps)
+    #     f.write("Received {0} episodes from {1} season(s)\n\n".format(episode_count, season_count))
+    #     for ep in eps_flat:
+    #         f.write(fancy_episode(ep))
