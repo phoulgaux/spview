@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html>
+<head>
 <meta charset="utf-8">
 <style>
 
@@ -11,6 +13,7 @@ body {
 }
 
 </style>
+</head>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
@@ -28,7 +31,7 @@ var arc = d3.svg.arc()
 
 var pie = d3.layout.pie()
     .sort(null)
-    .value(function(d) { return d.population; });
+    .value(function(d) { return d.Number; });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -39,7 +42,7 @@ var svg = d3.select("body").append("svg")
 d3.csv("data.csv", function(error, data) {
 
   data.forEach(function(d) {
-    d.population = +d.population;
+    d.Number = +d.Number;
   });
 
   var g = svg.selectAll(".arc")
@@ -49,14 +52,16 @@ d3.csv("data.csv", function(error, data) {
 
   g.append("path")
       .attr("d", arc)
-      .style("fill", function(d) { return color(d.data.age); });
+      .style("fill", function(d) { return color(d.data.Month); });
 
   g.append("text")
       .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
       .attr("dy", ".35em")
       .style("text-anchor", "middle")
-      .text(function(d) { return d.data.age; });
+      .text(function(d) { return d.data.Month + ": " + d.data.Number; });
 
 });
 
 </script>
+</body>
+</html>
